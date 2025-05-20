@@ -2,10 +2,12 @@ import 'package:dashboard_pessoal/class/transactions/transactions.dart';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:faker/faker.dart';
+
 class Balance {
 	final int month;
 	final int year;
-	final double amount;
+	double amount;
 	Transactions transactions = Transactions(transactions: []);
 
 	Balance({
@@ -16,6 +18,7 @@ class Balance {
 	
 	void addTransaction(Transaction transaction) {
 		transactions.addTransaction(transaction);
+		getTotalAmountDate(month,year);
 	}
 
 	void removeTransaction(int id) {
@@ -38,8 +41,13 @@ class Balance {
 		return transactions.getAllTypeTransactions(type);
 	}
 
+	double getTotalAmountTypeDate(TransactionType type){
+		return transactions.getTotalAmountDateType(type, month, year);
+	}
+
 	double getTotalAmountDate(int month, int year) {
-		return transactions.getTotalAmountDate(month, year);
+		amount = transactions.getTotalAmountDate(month, year);
+		return amount;
 	}
 
 	Map<String, dynamic> toJson() {
@@ -61,17 +69,51 @@ class Balance {
 }
 
 class BalanceList {
-	final DateTime currentDate = DateTime.now();
+	DateTime currentDate = DateTime.now();
 	late final List<Balance> balances;
 
+	void addFakeTransactions(bool createFakeTransitcitons) {
+		if(createFakeTransitcitons){
+			final faker = Faker();
+			for (int i = 0; i < 100; i++) {
+				final transaction = Transaction(
+					id: faker.randomGenerator.integer(1000),
+					description: faker.lorem.sentence(),
+					amount: faker.randomGenerator.decimal(scale: 1000),
+					date: faker.date.dateTime(minYear: 2025, maxYear: 2028),
+					type: faker.randomGenerator.boolean() ? TransactionType.expense : TransactionType.revenue,
+					process: faker.randomGenerator.boolean() ? EfitevedTransaction.loading : EfitevedTransaction.finished,
+				);
+				addTransaction(transaction.date.month, transaction.date.year, transaction);
+			}
+			final transaction = Transaction(
+				id: faker.randomGenerator.integer(1000),
+				description: faker.lorem.sentence(),
+				amount: faker.randomGenerator.decimal(scale: 1000),
+				date: DateTime.now(),
+				type: faker.randomGenerator.boolean() ? TransactionType.expense : TransactionType.revenue,
+				process: faker.randomGenerator.boolean() ? EfitevedTransaction.loading : EfitevedTransaction.finished,
+			);
+			addTransaction(transaction.date.month, transaction.date.year, transaction);
+		}
+	}
+
 	void initialize() {
+		int yearsAhead = 10; // Define quantos anos à frente
+		int yearsBehind = 10; // Define quantos anos atrás
+
 		balances = List.generate(
-			96,
-			(index) => Balance(
-				month: (index % 12) + 1,
-				year: DateTime.now().year + (index ~/ 12),
-				amount: 0.0,
-			),
+			(yearsAhead + yearsBehind + 1) * 12,
+			(index) {
+				final yearOffset = (index ~/ 12) - yearsBehind;
+				final month = (index % 12) + 1;
+				final year = currentDate.year + yearOffset;
+				return Balance(
+					month: month,
+					year: year,
+					amount: 0.0,
+				);
+			},
 		);
 	}
 
@@ -116,7 +158,27 @@ class BalanceList {
 		return balances;
 	}
 
+	// Retorna as transações mais recentes de todos os balances
+	List<Transaction> getRecentTransactions(int qtd) {
+		final allTransactions = balances
+			.expand((balance) => balance.transactions.transactions)
+			.toList();
+
+		allTransactions.sort((a, b) => 
+			(a.date.difference(currentDate).inMilliseconds).abs().compareTo(
+				(b.date.difference(currentDate).inMilliseconds).abs()
+			)
+		);
+
+		return allTransactions.take(qtd).toList();
+	}
+
 	Balance getCurrentBalance() {
+		return getBalance(currentDate.month, currentDate.year);
+	}
+
+	Balance getTodayBalance() {
+		currentDate = DateTime.now();
 		return getBalance(currentDate.month, currentDate.year);
 	}
 
@@ -128,6 +190,23 @@ class BalanceList {
 	Balance getNextBalance() {
 		final nextDate = DateTime(currentDate.year, currentDate.month + 1);
 		return getBalance(nextDate.month, nextDate.year);
+	}
+
+	Balance todayBalance(){
+		currentDate = DateTime.now();
+		return getCurrentBalance();
+	}
+
+	Balance previousBalance(){
+		final nextDate = DateTime(currentDate.year, currentDate.month - 1);
+		currentDate = nextDate;
+		return getPreviousBalance();
+	}
+
+	Balance nextBalance(){
+		final nextDate = DateTime(currentDate.year, currentDate.month + 1);
+		currentDate = nextDate;
+		return getNextBalance();
 	}
 
 	Balance getBalanceByIndex(int index) {

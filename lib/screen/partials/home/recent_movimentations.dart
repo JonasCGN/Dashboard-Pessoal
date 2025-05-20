@@ -1,9 +1,10 @@
 import 'package:dashboard_pessoal/class/color/colors_app.dart';
 import 'package:dashboard_pessoal/class/date/date_format.dart';
+import 'package:dashboard_pessoal/class/provider/balance_list_provider.dart';
 import 'package:dashboard_pessoal/class/text/fonte.dart';
 import 'package:dashboard_pessoal/class/transactions/transactions.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 
 class MovimentacaoInformation extends StatelessWidget {
 
@@ -82,7 +83,7 @@ class MovimentacaoInformation extends StatelessWidget {
 									spacing: 5,
 									children: [
 										TextApp(
-											texto: "${date.day}. ${DateFormat.formatDayWeekName(date)}",
+											texto: "${date.day}. ${DateFormatString.formatDayWeekName(date)} ${DateFormatString.formatMonthName(date)}",
 											size: 10,
 										),
 										TextApp(
@@ -111,38 +112,48 @@ class MovimentacaoInformation extends StatelessWidget {
 }
 
 class RecentMovimentations extends StatelessWidget {
-	const RecentMovimentations({super.key});
+  const RecentMovimentations({super.key});
 
-	@override
-	Widget build(BuildContext context) {
-		return SizedBox(
-			width: double.infinity,
-			child: Column(
-				crossAxisAlignment: CrossAxisAlignment.start,
-				spacing: 5,
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<BalanceListProvider>(
+      builder: (context, balanceListProvider, child) {
+        List<Transaction> transactions = balanceListProvider.getRecentTransactions(5);
+		return SingleChildScrollView(
+          child: Container(
+            padding: const EdgeInsets.all(10),
+            child: SizedBox(
+              width: double.infinity,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
 				children: [
-					TextApp(
-						texto: "Movimentações Recentes", 
-						size: 24
-					),
-					MovimentacaoInformation(
-						namePay: "Farmacia", 
-						categoria: "Saude", 
-						date: DateTime.now(), 
-						amount: 10.0,
-						type: TransactionType.revenue,
-						transaction: EfitevedTransaction.loading,
-					),
-					MovimentacaoInformation(
-						namePay: "Farmacia", 
-						categoria: "Saude", 
-						date: DateTime.now(), 
-						amount: 10.0,
-						type: TransactionType.revenue,
-						transaction: EfitevedTransaction.finished,
-					),
-				],
-			),
-		);
-	}
+				  TextApp(
+					texto: "Movimentações Recentes",
+					size: 24,
+				  ),
+				  ListView.separated(
+					shrinkWrap: true,
+					physics: NeverScrollableScrollPhysics(),
+					itemCount: transactions.length,
+					itemBuilder: (context, index) {
+					  final transaction = transactions[index];
+					  return MovimentacaoInformation(
+						namePay: transaction.description,
+						categoria: "Saude",
+						date: transaction.date,
+						amount: transaction.amount,
+						type: transaction.type,
+						transaction: transaction.process,
+					  );
+					},
+					separatorBuilder: (context, index) => SizedBox(height: 5),
+				  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
 }

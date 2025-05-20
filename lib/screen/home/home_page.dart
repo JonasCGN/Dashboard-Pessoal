@@ -1,5 +1,5 @@
 import 'package:dashboard_pessoal/class/color/colors_app.dart';
-import 'package:dashboard_pessoal/screen/home/home.dart';
+import 'package:dashboard_pessoal/screen/partials/home/home.dart';
 import 'package:flutter/material.dart';
 
 class MyHomePage extends StatelessWidget {

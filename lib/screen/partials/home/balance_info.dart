@@ -1,17 +1,21 @@
+import 'package:dashboard_pessoal/class/provider/balance_list_provider.dart';
 import 'package:dashboard_pessoal/class/color/colors_app.dart';
 import 'package:dashboard_pessoal/class/text/fonte.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class SaldoInfo extends StatelessWidget {
 	final double valor;
 	final String text;
 	final bool meio;
+	final bool showText;
 
 	const SaldoInfo({
 		super.key,
 		required this.valor,
 		required this.text,
-		required this.meio
+		required this.meio,
+		this.showText = true
 	});
 
 	@override
@@ -22,10 +26,12 @@ class SaldoInfo extends StatelessWidget {
 			children: [
 				if (meio)
 					...[
-						TextApp(
-							texto: text,
-							size: 20,
-						),
+						if(showText)...[
+							TextApp(
+								texto: text,
+								size: 20,
+							),
+						],
 						TextApp(
 							texto: "R\$${valor.toStringAsFixed(2).replaceAll('.', ',')}",
 							size: 24,
@@ -34,11 +40,13 @@ class SaldoInfo extends StatelessWidget {
 					]
 				else
 					...[
-						TextApp(
-							texto: text,
-							size: 14,
-							align: TextAlign.center,
-						),
+						if(showText)...[
+							TextApp(
+								texto: text,
+								size: 14,
+								align: TextAlign.center,
+							),
+						],
 						const SizedBox(height: 10),
 						Container(
 							width: 70,
@@ -63,19 +71,22 @@ class SaldoInfo extends StatelessWidget {
 }
 
 class BalanceInfo extends StatelessWidget {
-	final double valor;
-	const BalanceInfo({super.key, this.valor = 0.0});
+	const BalanceInfo({super.key});
 
 	@override
 	Widget build(BuildContext context) {
-		return Row(
-			crossAxisAlignment: CrossAxisAlignment.center,
-			mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-			children: [
-				SaldoInfo(valor: valor, text: "Anterior",meio: false),
-				SaldoInfo(valor: 1000.0, text: "Atual",meio: true,),
-				SaldoInfo(valor: valor, text: "Posterior",meio: false),
-			],
+		return Consumer<BalanceListProvider>(
+			builder: (context,balance,child){
+				return Row(
+					crossAxisAlignment: CrossAxisAlignment.center,
+					mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+					children: [
+						SaldoInfo(valor: balance.getBalance(-1).amount, text: "Anterior",meio: false),
+						SaldoInfo(valor: balance.getBalance(0).amount, text: "Atual",meio: true,),
+						SaldoInfo(valor: balance.getBalance(1).amount, text: "Posterior",meio: false),
+					],
+				);
+			}
 		);
 	}
 }

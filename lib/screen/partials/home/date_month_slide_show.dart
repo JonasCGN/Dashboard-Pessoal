@@ -1,35 +1,50 @@
+import 'package:dashboard_pessoal/class/color/colors_app.dart';
+import 'package:dashboard_pessoal/class/date/date_format.dart';
+import 'package:dashboard_pessoal/class/provider/balance_list_provider.dart';
 import 'package:dashboard_pessoal/class/text/fonte.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 
 class DateMonthSlideShow extends StatelessWidget {
-  const DateMonthSlideShow({super.key});
+  	const DateMonthSlideShow({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-		child: Row(
-			mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-			children: [
-				SvgPicture.asset(
-					'assets/icons/home/arrow.svg',
-					width: 48,
-					height: 48,
-				),
-				TextApp(
-					texto: "Month", 
-					size: 37
-				),
-				Transform.rotate(
-					angle: 3.1416, // Rotate 180 degrees (pi radians)
-					child: SvgPicture.asset(
-						'assets/icons/home/arrow.svg',
-						width: 48,
-						height: 48,
-					),
-				),
-			],
-		),
-	);
-  }
+	@override
+	Widget build(BuildContext context) {
+		return Consumer<BalanceListProvider>(
+			builder: (context,balance,child){
+				return Row(
+					mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+					children: [
+						IconButton(
+							onPressed: (){
+								balance.previousBalance();
+							}, 
+							icon: Icon(
+								Icons.arrow_back_ios_rounded,
+								color: IconColors.category
+							),
+						),
+						TextButton(
+							onPressed: (){
+								balance.todayBalance();
+							}, 
+							child: TextApp(
+								texto: DateFormatString.formatMonthName(balance.balanceList.currentDate), 
+								size: 37
+							)
+						),
+						IconButton(
+							onPressed: (){
+								balance.nextBalance();
+							}, 
+							icon: Icon(
+								Icons.arrow_forward_ios_rounded,
+								color: IconColors.category,
+							),
+						),
+					],
+				);
+			}
+		);
+	}
 }

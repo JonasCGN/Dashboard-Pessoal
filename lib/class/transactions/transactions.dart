@@ -25,13 +25,6 @@ class Transaction{
 		required this.process
 	});
 	
-	void __showTransaction() {
-		print('ID: $id');
-		print('Descrição: $description');
-		print('Valor: $amount');
-		print('Data: ${date.toLocal()}');
-		print('Tipo: ${type == TransactionType.expense ? 'Despesa' : 'Receita'}');
-	}
 }
 
 class Transactions {
@@ -75,20 +68,24 @@ class Transactions {
 	double getTotalAmountDate(int month, int year) {
 		double total = 0.0;
 		
-		for (Transaction transaction in transactions) {
-			if (transaction.date.month == month && transaction.date.year == year) {
-				total += transaction.amount;
-			}
-		}
+		total = transactions
+			.where((transaction) => transaction.date.month == month && transaction.date.year == year)
+			.map((transaction) => transaction.amount)
+			.reduce((sum, amount) => sum + amount);
 
 		return total;
 	}
 
-	void __showTransactions() {
-		for (Transaction transaction in transactions) {
-			transaction.__showTransaction();
-		}
+	double getTotalAmountDateType(TransactionType type, int month, int year) {
+		double total = 0.0;
+		total = transactions
+			.where((transaction) => transaction.type == type && transaction.date.month == month && transaction.date.year == year)
+			.map((transaction) => transaction.amount)
+			.fold(0.0, (sum, amount) => sum + amount);
+
+		return total;
 	}
+
 
 	Map<String, dynamic> toJson() {
 		return {

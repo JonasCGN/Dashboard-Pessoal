@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:dashboard_pessoal/class/transactions/transactions.dart';
 import 'package:dashboard_pessoal/class/balance/balance.dart';
+import 'package:faker/faker.dart';
 
 void testeinicializabalances() {
 	test('Inicializa com 96 balances', () {
@@ -174,10 +175,34 @@ void testebalancenavigationmethods() {
 	test('getCurrentBalance, getPreviousBalance, getNextBalance retornam meses corretos', () {
 		final balanceList = BalanceList();
 		balanceList.initialize();
-		// Considerando que a data atual é maio (5), conforme contexto
-		expect(balanceList.getCurrentBalance().month, 5);
-		expect(balanceList.getPreviousBalance().month, 4);
-		expect(balanceList.getNextBalance().month, 6);
+		final now = DateTime.now();
+		expect(balanceList.getCurrentBalance().month, now.month);
+		expect(balanceList.getPreviousBalance().month, now.month - 1);
+		expect(balanceList.getNextBalance().month, now.month);
+
+	});
+}
+
+void testerecenttransactions() {
+	test('getRecentTransactions retorna a quantidade correta', () {
+		final balanceList = BalanceList();
+		balanceList.initialize();
+		final faker = Faker();
+		// Adiciona transações fake em diferentes balances
+		for (int i = 0; i < 10; i++) {
+			final transaction = Transaction(
+				id: i,
+				description: faker.lorem.sentence(),
+				amount: faker.randomGenerator.decimal(min: 10, scale: 100),
+				date: DateTime(2025, (i % 12) + 1, 1),
+				type: i % 2 == 0 ? TransactionType.revenue : TransactionType.expense,
+				process: EfitevedTransaction.finished,
+			);
+			balanceList.addTransaction((i % 12) + 1, 2025, transaction);
+		}
+		final recent = balanceList.getRecentTransactions(5);
+		expect(recent.length, 5);
+		expect(recent.first, isA<Transaction>());
 	});
 }
 
@@ -192,4 +217,5 @@ void main() {
 	testegetbalancebyindex();
 	testegetbalancebydate();
 	testebalancenavigationmethods();
+	testerecenttransactions();
 }

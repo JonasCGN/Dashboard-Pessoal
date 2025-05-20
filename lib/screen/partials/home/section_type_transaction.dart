@@ -1,5 +1,7 @@
 import 'package:dashboard_pessoal/class/color/colors_app.dart';
 import 'package:dashboard_pessoal/class/text/fonte.dart';
+import 'package:dashboard_pessoal/routes/routes.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -14,19 +16,23 @@ class OptionTypeTransaction extends StatelessWidget {
 
 	@override
 	Widget build(BuildContext context) {
-		return Row(
-			spacing:5,
-			children: [
-				SvgPicture.asset(
-					caminhoSvg,
-					width: 40,
-					height: 40,
-				),
-				TextApp(
-					texto: texto, 
-					size: 28
-				)
-			],
+		return Container(
+			width: double.infinity,
+			color: CupertinoColors.transparent,
+			child: Row(
+				spacing:5,
+				children: [
+					SvgPicture.asset(
+						caminhoSvg,
+						width: 40,
+						height: 40,
+					),
+					TextApp(
+						texto: texto, 
+						size: 28
+					)
+				],
+			),
 		);
   }
 }
@@ -56,18 +62,34 @@ class SectionTypeTransaction extends StatelessWidget {
 					child: Column(
 						spacing: 13,
 						children: [
-							OptionTypeTransaction(
-								caminhoSvg: 'assets/icons/home/bonificacao_icon.svg',
-								texto: "Receita",
+							GestureDetector(
+								onTap: (){
+									Navigator.pushNamed(
+										context, 
+										Routes.showTransactionsRevenue
+									);
+								},
+								child: OptionTypeTransaction(
+									caminhoSvg: 'assets/icons/home/bonificacao_icon.svg',
+									texto: "Receita",
+								),
 							),
 							Container(
 								color: BackgroundAndBarColors.background,
 								height: 1,
 								width: double.infinity,
 							),
-							OptionTypeTransaction(
+							GestureDetector(
+								onTap: (){
+									Navigator.pushNamed(
+										context, 
+										Routes.showTransactionsExpense
+									);
+								},
+								child: OptionTypeTransaction(
 								caminhoSvg: 'assets/icons/home/despesa_icon.svg',
 								texto: "Despesa",
+								),
 							),
 						],
 					),
