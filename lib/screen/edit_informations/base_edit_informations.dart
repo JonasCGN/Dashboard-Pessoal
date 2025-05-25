@@ -54,6 +54,8 @@ class BaseEditInformations extends StatelessWidget {
 								
 								final Transaction transacao = value.getFormData();
 								Provider.of<BalanceListProvider>(context,listen: false).addTransaction(transacao);
+
+								Navigator.pop(context);
 							},
 							child: Icon(
 								Icons.check,
