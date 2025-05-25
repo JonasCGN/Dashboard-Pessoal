@@ -7,6 +7,7 @@ class DateFormatString {
 		String dayWeekName = weekDays[date.weekday % 7];
 		return dayWeekName;
 	}
+	
 	static String formatMonthName(DateTime date) {
 		initializeDateFormatting('pt_BR');
 
@@ -19,5 +20,23 @@ class DateFormatString {
 		}
 
 		return monthName;
+	}
+
+	static String traduzDate(DateTime selecioned) {
+		final now = DateTime.now();
+		final today = DateTime(now.year, now.month, now.day);
+		final selectedDay = DateTime(selecioned.year, selecioned.month, selecioned.day);
+
+		if (selectedDay == today) {
+			return "Hoje";
+		} else if (selectedDay == today.subtract(Duration(days: 1))) {
+			return "Ontem";
+		} else if (selectedDay == today.add(Duration(days: 1))) {
+			return "Amanhã";
+		} else if (selectedDay.year == today.year && selectedDay.month == today.month) {
+			return "${selectedDay.day}/${selectedDay.month}";
+		} else {
+			return "${selectedDay.day}/${selectedDay.month}/${selectedDay.year}";
+		}
 	}
 }

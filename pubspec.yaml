@@ -38,13 +38,18 @@ dependencies:
   shared_preferences: ^2.5.3
   faker: ^2.2.0
   intl: ^0.20.2
-  
+  font_awesome_flutter: ^10.8.0
+  flutter_dotenv: ^5.1.0
+  oauth1: ^2.1.0
+  http: ^1.4.0
+  crypto: ^3.0.2
+  flutter_svg: ^2.0.10
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
   test: ^1.21.0
   flutter_lints: ^5.0.0
-  flutter_svg: ^2.0.10
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -59,11 +64,49 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/icons/home/arrow.svg
-    - assets/icons/home/despesa_icon.svg
-    - assets/icons/home/bonificacao_icon.svg
-    - assets/icons/home/process/final.svg
-    - assets/icons/home/process/loading.svg
+    - .env
+    - assets/icons/categorias/bank/svgs/
+    - assets/icons/categorias/budget/svgs/
+    - assets/icons/categorias/credit card/svgs/
+    - assets/icons/categorias/expenses/svgs/
+    - assets/icons/categorias/finance/svgs/
+    - assets/icons/categorias/fitness/svgs/
+    - assets/icons/categorias/food/svgs/
+    - assets/icons/categorias/health/svgs/
+    - assets/icons/categorias/income/svgs/
+    - assets/icons/categorias/investment/svgs/
+    - assets/icons/categorias/invoice/svgs/
+    - assets/icons/categorias/loan/svgs/
+    - assets/icons/categorias/market/svgs/
+    - assets/icons/categorias/money/svgs/
+    - assets/icons/categorias/payment/svgs/
+    - assets/icons/categorias/savings/svgs/
+    - assets/icons/categorias/shopping/svgs/
+    - assets/icons/categorias/tax/svgs/
+    - assets/icons/categorias/wallet/svgs/
+    
+    - assets/icons/categorias/bank/
+    - assets/icons/categorias/budget/
+    - assets/icons/categorias/credit card/
+    - assets/icons/categorias/expenses/
+    - assets/icons/categorias/finance/
+    - assets/icons/categorias/fitness/
+    - assets/icons/categorias/food/
+    - assets/icons/categorias/health/
+    - assets/icons/categorias/income/
+    - assets/icons/categorias/investment/
+    - assets/icons/categorias/invoice/
+    - assets/icons/categorias/loan/
+    - assets/icons/categorias/market/
+    - assets/icons/categorias/money/
+    - assets/icons/categorias/payment/
+    - assets/icons/categorias/savings/
+    - assets/icons/categorias/shopping/
+    - assets/icons/categorias/tax/
+    - assets/icons/categorias/wallet/
+
+    - assets/icons/home/
+    - assets/icons/home/process/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

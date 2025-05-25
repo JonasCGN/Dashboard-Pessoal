@@ -7,45 +7,36 @@ class BalanceListProvider extends ChangeNotifier {
 
 	BalanceListProvider() {
 		_balanceList = BalanceList();
-		_balanceList.initialize();
-		_balanceList.addFakeTransactions(true);
+		_balanceList.initialize(10, 10);
+		// _balanceList.addFakeTransactions(true);
 	}
 
 	BalanceList get balanceList => _balanceList;
 
 	List<Balance> get allBalances => _balanceList.getAllBalances();
 
-	Balance getBalance(int index){
-		switch (index) {
-			case -1:
-				return _balanceList.getPreviousBalance();
-			case 1:
-				return _balanceList.getNextBalance();
-			default:
-				return _balanceList.getCurrentBalance();
-		}
-	}
+	Balance get currentBalance => _balanceList.getBalance(_balanceList.currentDate.month, _balanceList.currentDate.year);
+	
 
-  	Balance todayBalance() {
-		final balance = _balanceList.todayBalance();
+	void todayBalance() {
+		_balanceList.currentDate = DateTime.now();
 		notifyListeners();
-		return balance;
 	}
 
-	Balance previousBalance() {
-		final previousBalance = _balanceList.previousBalance();
+	void previousBalance() {
+		final prev = DateTime(_balanceList.currentDate.year, _balanceList.currentDate.month - 1);
+		_balanceList.currentDate = prev;
 		notifyListeners();
-		return previousBalance;
 	}
 
-	Balance nextBalance() {
-		final nextBalance = _balanceList.nextBalance();
+	void nextBalance() {
+		final next = DateTime(_balanceList.currentDate.year, _balanceList.currentDate.month + 1);
+		_balanceList.currentDate = next;
 		notifyListeners();
-		return nextBalance;
 	}
 
-	void addTransaction(int month, int year, Transaction transaction) {
-		_balanceList.addTransaction(month, year, transaction);
+	void addTransaction(Transaction transaction) {
+		_balanceList.addTransaction(transaction);
 		notifyListeners();
 	}
 
@@ -87,8 +78,7 @@ class BalanceListProvider extends ChangeNotifier {
 	}
 
 	Future<void> loadFromFile(String filePath) async {
-    await _balanceList.loadFromFile(filePath);
-    notifyListeners();
-  }
-
+		await _balanceList.loadFromFile(filePath);
+		notifyListeners();
+	}
 }

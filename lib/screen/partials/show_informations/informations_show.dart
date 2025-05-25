@@ -32,12 +32,8 @@ class InformationsShow extends StatelessWidget {
 								itemBuilder: (context, index) {
 									final transaction = transactions[index];
 									return MovimentacaoInformation(
-										namePay: transaction.description,
-										categoria: "Saude",
-										date: transaction.date,
-										amount: transaction.amount,
-										type: transaction.type,
-										transaction: transaction.process,
+										transaction: transaction,
+										sectionScreen: true,
 									);
 								},
 								separatorBuilder: (context, index) => SizedBox(height: 5),

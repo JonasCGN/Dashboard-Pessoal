@@ -17,12 +17,12 @@ class BaseShowInformations extends StatelessWidget {
 			child: Container(
 				padding: EdgeInsets.all(10),
 				child: Column(
-				children: [
-					TotalMonthAmount(transactionType: tipoTransacao),
-					DateMonthSlideShow(),
-					InformationsShow(tipoTransacao:tipoTransacao)
-				]
-			),
+					children: [
+						TotalMonthAmount(transactionType: tipoTransacao),
+						DateMonthSlideShow(),
+						InformationsShow(tipoTransacao:tipoTransacao)
+					]
+				),
 			) 
 		);
 	}

@@ -8,105 +8,115 @@ import 'package:provider/provider.dart';
 
 class MovimentacaoInformation extends StatelessWidget {
 
-	final String namePay;
-	final String categoria;
-	final DateTime date;
-	final double amount;
-	final TransactionType type;
-	final EfitevedTransaction transaction;
+	final Transaction transaction;
+	final bool sectionScreen;
 
 	const MovimentacaoInformation({
 		super.key,
-		required this.namePay,
-		required this.categoria,
-		required this.date,
-		required this.amount,
-		required this.type,
 		required this.transaction,
+		required this.sectionScreen,
 	});
 
 	@override
 	Widget build(BuildContext context) {
-		return Container(
-			decoration: BoxDecoration(
-				color: MiscellaneousColors.darkGray,
+		return Material(
+			color: MiscellaneousColors.darkGray,
+			borderRadius: BorderRadius.all(Radius.circular(10)),
+			child: InkWell(
+				// hoverColor: BackgroundAndBarColors.barColor,
+				focusColor:BackgroundAndBarColors.barColor ,
 				borderRadius: BorderRadius.all(Radius.circular(10)),
-			),
-			padding: EdgeInsets.all(10),
-			child: Row(
-					mainAxisAlignment: MainAxisAlignment.spaceBetween,
-					children: [
-						Row(
-							spacing: 10,
+				onTap: (){
+
+				},
+				child: Container(
+					decoration: BoxDecoration(
+						borderRadius: BorderRadius.all(Radius.circular(10)),
+					),
+					padding: EdgeInsets.all(10),
+					child: Row(
+							mainAxisAlignment: MainAxisAlignment.spaceBetween,
 							children: [
-								Container(
-									width: 50,
-									height: 50,
-									decoration: BoxDecoration(
-										borderRadius: BorderRadius.all(Radius.circular(50)),
-										color: type == TransactionType.expense ? FinancialColors.expense : FinancialColors.income,
-									),
-									child:  Icon(
-										transaction == EfitevedTransaction.finished ? Icons.check_rounded : Icons.more_horiz,
-										color: IconColors.category,
-										size: 30,
-									) 
-								),
-								Column(
-									crossAxisAlignment: CrossAxisAlignment.start,
-									spacing: 5,
+								Row(
+									spacing: 10,
 									children: [
-										TextApp(
-											texto: "Nome do Pagamento", 
-											size: 12,
-										),
 										Container(
-											padding: EdgeInsets.all(2),
+											width: 50,
+											height: 50,
 											decoration: BoxDecoration(
+												borderRadius: BorderRadius.all(Radius.circular(50)),
+												color: transaction.type == TransactionType.expense ? FinancialColors.expense : FinancialColors.income,
+											),
+											child:  Icon(
+												transaction.process == EfitevedTransaction.finished ? Icons.check_rounded : Icons.more_horiz,
 												color: IconColors.category,
-												borderRadius: BorderRadius.all(Radius.circular(5))
-											),
-											child: TextApp(
-												texto: "Bonificação", 
-												size: 8,
-												align: TextAlign.start,
-												corTexto: TextColors.black,
-											),
-										)
-									]
-								),
-							],
-						),
-						Row(
-							children: [
-								Column(
-									spacing: 5,
-									children: [
-										TextApp(
-											texto: "${date.day}. ${DateFormatString.formatDayWeekName(date)} ${DateFormatString.formatMonthName(date)}",
-											size: 10,
+												size: 30,
+											) 
 										),
-										TextApp(
-											texto: "R\$${amount.toStringAsFixed(2).toString().replaceFirst('.', ',')}",
-											size: 10,
+										Column(
+											crossAxisAlignment: CrossAxisAlignment.start,
+											spacing: 5,
+											children: [
+												TextApp(
+													texto: (transaction.description.length > 20) ? 
+													"${transaction.description.substring(0, 20).trimRight()}..." : 
+													transaction.description,
+													size: 12,
+												),
+												Container(
+													padding: EdgeInsets.all(2),
+													decoration: BoxDecoration(
+														color: IconColors.category,
+														borderRadius: BorderRadius.all(Radius.circular(5))
+													),
+													child: TextApp(
+														texto: "Bonificação", 
+														size: 8,
+														align: TextAlign.start,
+														corTexto: TextColors.black,
+													),
+												)
+											]
 										),
 									],
 								),
-								Container(
-									constraints: BoxConstraints.tightFor(height: 50),
-									child: Column(
-										children: [
-											Icon(
-												Icons.more_horiz,
-												color: TextColors.white,
-											)
-										],
-									),
+								Row(
+									children: [
+										Column(
+											spacing: 5,
+											crossAxisAlignment: CrossAxisAlignment.end,
+											children: [
+												TextApp(
+													texto: 
+													(sectionScreen) ? 
+														"${transaction.dateVenc.day}. ${DateFormatString.formatDayWeekName(transaction.dateVenc)}"
+														:
+														"${transaction.dateVenc.day}/${DateFormatString.formatMonthName(transaction.dateVenc)}",
+													size: 10,
+												),
+												TextApp(
+													texto: "R\$${transaction.amount.toStringAsFixed(2).toString().replaceFirst('.', ',')}",
+													size: 10,
+												),
+											],
+										),
+										Container(
+											constraints: BoxConstraints.tightFor(height: 50),
+											child: Column(
+												children: [
+													Icon(
+														Icons.more_horiz,
+														color: TextColors.white,
+													)
+												],
+											),
+										)
+									],
 								)
 							],
-						)
-					],
+						),
 				),
+			),
 		);
 	}
 }
@@ -138,12 +148,8 @@ class RecentMovimentations extends StatelessWidget {
 					itemBuilder: (context, index) {
 					  final transaction = transactions[index];
 					  return MovimentacaoInformation(
-						namePay: transaction.description,
-						categoria: "Saude",
-						date: transaction.date,
-						amount: transaction.amount,
-						type: transaction.type,
-						transaction: transaction.process,
+						transaction: transaction,
+						sectionScreen: false,
 					  );
 					},
 					separatorBuilder: (context, index) => SizedBox(height: 5),

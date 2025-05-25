@@ -15,7 +15,18 @@ class BaseShowInformationsPage extends StatelessWidget {
 		return Scaffold(
 			appBar: AppBar(
 				backgroundColor: BackgroundAndBarColors.barColor,
-			),
+				iconTheme: IconThemeData(
+					color: IconColors.category,
+				),
+				leading: Navigator.canPop(context)
+					? IconButton(
+						icon: Icon(Icons.arrow_back),
+						onPressed: () {
+							Navigator.of(context).pop();
+						},
+					)
+					: null,
+			),	
 			backgroundColor: BackgroundAndBarColors.background,
 			body: BaseShowInformations(tipoTransacao: tipoTransacao,),
 			floatingActionButton: FloatingActionButton(

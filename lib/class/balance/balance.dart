@@ -1,3 +1,4 @@
+import 'package:dashboard_pessoal/class/category/category.dart';
 import 'package:dashboard_pessoal/class/transactions/transactions.dart';
 import 'dart:convert';
 import 'dart:io';
@@ -18,7 +19,7 @@ class Balance {
 	
 	void addTransaction(Transaction transaction) {
 		transactions.addTransaction(transaction);
-		getTotalAmountDate(month,year);
+		getTotalAmountDate();
 	}
 
 	void removeTransaction(int id) {
@@ -45,8 +46,8 @@ class Balance {
 		return transactions.getTotalAmountDateType(type, month, year);
 	}
 
-	double getTotalAmountDate(int month, int year) {
-		amount = transactions.getTotalAmountDate(month, year);
+	double getTotalAmountDate() {
+		amount = transactions.getTotalAmountDate();
 		return amount;
 	}
 
@@ -70,38 +71,32 @@ class Balance {
 
 class BalanceList {
 	DateTime currentDate = DateTime.now();
+	Categories categories = Categories();
 	late final List<Balance> balances;
 
 	void addFakeTransactions(bool createFakeTransitcitons) {
+
 		if(createFakeTransitcitons){
 			final faker = Faker();
 			for (int i = 0; i < 100; i++) {
+				DateTime dateVenc = faker.date.dateTime(minYear: 2025, maxYear: 2028);
+				DateTime dateLanc = faker.date.dateTime(minYear: 2025, maxYear: 2028);
 				final transaction = Transaction(
 					id: faker.randomGenerator.integer(1000),
 					description: faker.lorem.sentence(),
 					amount: faker.randomGenerator.decimal(scale: 1000),
-					date: faker.date.dateTime(minYear: 2025, maxYear: 2028),
+					dateVenc: dateVenc,
+					dateLanc: dateLanc,
 					type: faker.randomGenerator.boolean() ? TransactionType.expense : TransactionType.revenue,
 					process: faker.randomGenerator.boolean() ? EfitevedTransaction.loading : EfitevedTransaction.finished,
+					category: faker.randomGenerator.integer(categories.categories.keys.length),
 				);
-				addTransaction(transaction.date.month, transaction.date.year, transaction);
+				addTransaction(transaction);
 			}
-			final transaction = Transaction(
-				id: faker.randomGenerator.integer(1000),
-				description: faker.lorem.sentence(),
-				amount: faker.randomGenerator.decimal(scale: 1000),
-				date: DateTime.now(),
-				type: faker.randomGenerator.boolean() ? TransactionType.expense : TransactionType.revenue,
-				process: faker.randomGenerator.boolean() ? EfitevedTransaction.loading : EfitevedTransaction.finished,
-			);
-			addTransaction(transaction.date.month, transaction.date.year, transaction);
 		}
 	}
 
-	void initialize() {
-		int yearsAhead = 10; // Define quantos anos à frente
-		int yearsBehind = 10; // Define quantos anos atrás
-
+	void initialize(int yearsAhead,int yearsBehind) {
 		balances = List.generate(
 			(yearsAhead + yearsBehind + 1) * 12,
 			(index) {
@@ -124,8 +119,8 @@ class BalanceList {
 		);
 	}
 
-	void addTransaction(int month, int year, Transaction transaction) {
-		final balance = getBalance(month, year);
+	void addTransaction(Transaction transaction) {
+		final balance = getBalance(transaction.dateVenc.month, transaction.dateVenc.year);
 		balance.addTransaction(transaction);
 	}
 
@@ -134,9 +129,12 @@ class BalanceList {
 		balance.removeTransaction(id);
 	}
 
-	void updateTransaction(int month, int year, int id, Transaction updatedTransaction) {
-		final balance = getBalance(month, year);
-		balance.updateTransaction(id, updatedTransaction);
+	void updateTransaction(int oldMonth, int oldYear, int id, Transaction updatedTransaction) {
+		final oldBalance = getBalance(oldMonth, oldYear);
+		oldBalance.removeTransaction(id);
+
+		final newBalance = getBalance(updatedTransaction.dateVenc.month, updatedTransaction.dateVenc.year);
+		newBalance.addTransaction(updatedTransaction);
 	}
 
 	void clearTransactions(int month, int year) {
@@ -146,35 +144,36 @@ class BalanceList {
 
 	double getTotalAmountDate(int month, int year) {
 		final balance = getBalance(month, year);
-		return balance.getTotalAmountDate(month, year);
+		return balance.getTotalAmountDate();
 	}
 
 	List<Transaction> getAllTypeTransactions(int month, int year, TransactionType type) {
 		final balance = getBalance(month, year);
-		return balance.getAllTypeTransactions(type);
+		final transactions = balance.getAllTypeTransactions(type);
+		transactions.sort((a, b) => a.dateVenc.compareTo(b.dateVenc));
+		return transactions;
 	}
 
 	List<Balance> getAllBalances() {
 		return balances;
 	}
 
-	// Retorna as transações mais recentes de todos os balances
 	List<Transaction> getRecentTransactions(int qtd) {
 		final allTransactions = balances
 			.expand((balance) => balance.transactions.transactions)
+			.where((transaction) => transaction.dateVenc.isBefore(currentDate) || transaction.dateVenc.isAtSameMomentAs(currentDate))
 			.toList();
 
-		allTransactions.sort((a, b) => 
-			(a.date.difference(currentDate).inMilliseconds).abs().compareTo(
-				(b.date.difference(currentDate).inMilliseconds).abs()
-			)
-		);
+		allTransactions.sort((a, b) => b.dateVenc.compareTo(a.dateVenc));
 
 		return allTransactions.take(qtd).toList();
 	}
 
 	Balance getCurrentBalance() {
-		return getBalance(currentDate.month, currentDate.year);
+		Balance balance = getBalance(currentDate.month, currentDate.year);
+		// print(balance.amount);
+
+		return balance;
 	}
 
 	Balance getTodayBalance() {
@@ -190,23 +189,6 @@ class BalanceList {
 	Balance getNextBalance() {
 		final nextDate = DateTime(currentDate.year, currentDate.month + 1);
 		return getBalance(nextDate.month, nextDate.year);
-	}
-
-	Balance todayBalance(){
-		currentDate = DateTime.now();
-		return getCurrentBalance();
-	}
-
-	Balance previousBalance(){
-		final nextDate = DateTime(currentDate.year, currentDate.month - 1);
-		currentDate = nextDate;
-		return getPreviousBalance();
-	}
-
-	Balance nextBalance(){
-		final nextDate = DateTime(currentDate.year, currentDate.month + 1);
-		currentDate = nextDate;
-		return getNextBalance();
 	}
 
 	Balance getBalanceByIndex(int index) {
@@ -235,7 +217,7 @@ class BalanceList {
 			final List<dynamic> decodedData = jsonDecode(jsonData);
 			balances = decodedData.map((data) => Balance.fromJson(data)).toList();
 		} else {
-			initialize(); // Initialize if file doesn't exist
+			initialize(10,10); // Initialize if file doesn't exist
 		}
 	}
 }

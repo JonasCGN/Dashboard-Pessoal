@@ -76,17 +76,26 @@ class BalanceInfo extends StatelessWidget {
 	@override
 	Widget build(BuildContext context) {
 		return Consumer<BalanceListProvider>(
-			builder: (context,balance,child){
+			builder: (context, balance, child) {
+				final current = balance.currentBalance;
+				final prev = balance.balanceList.getBalance(
+					DateTime(balance.balanceList.currentDate.year, balance.balanceList.currentDate.month - 1).month,
+					DateTime(balance.balanceList.currentDate.year, balance.balanceList.currentDate.month - 1).year,
+				);
+				final next = balance.balanceList.getBalance(
+					DateTime(balance.balanceList.currentDate.year, balance.balanceList.currentDate.month + 1).month,
+					DateTime(balance.balanceList.currentDate.year, balance.balanceList.currentDate.month + 1).year,
+				);
 				return Row(
 					crossAxisAlignment: CrossAxisAlignment.center,
 					mainAxisAlignment: MainAxisAlignment.spaceEvenly,
 					children: [
-						SaldoInfo(valor: balance.getBalance(-1).amount, text: "Anterior",meio: false),
-						SaldoInfo(valor: balance.getBalance(0).amount, text: "Atual",meio: true,),
-						SaldoInfo(valor: balance.getBalance(1).amount, text: "Posterior",meio: false),
+						SaldoInfo(valor: prev.amount, text: "Anterior", meio: false),
+						SaldoInfo(valor: current.amount, text: "Atual", meio: true),
+						SaldoInfo(valor: next.amount, text: "Posterior", meio: false),
 					],
 				);
-			}
+			},
 		);
 	}
 }

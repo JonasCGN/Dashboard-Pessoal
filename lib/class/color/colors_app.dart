@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 class TextColors {
 	static Color white = const Color(0xFFFFFFFF);
 	static Color black = const Color(0xFF000000);
-	static Color placeholder = const Color(0x80000000);
+	static Color placeholder = const Color(0xFF9A9595);
 }
 
 class CategoryColors {
@@ -27,6 +27,7 @@ class IconColors {
 class BackgroundAndBarColors {
 	static Color background = const Color(0xFF1D1A1A);
 	static Color barColor = const Color(0xFF8B8B8B);
+	static Color transparent = const Color(0x00000000);
 }
 
 class ButtonColors {

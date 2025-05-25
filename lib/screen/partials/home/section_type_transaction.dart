@@ -1,37 +1,47 @@
 import 'package:dashboard_pessoal/class/color/colors_app.dart';
 import 'package:dashboard_pessoal/class/text/fonte.dart';
 import 'package:dashboard_pessoal/routes/routes.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class OptionTypeTransaction extends StatelessWidget {
 	final String caminhoSvg;
 	final String texto;
+	final Function() function;
+	final bool mainAxis;
+	final Color colorBack;
+
 	const OptionTypeTransaction({
 		super.key,
 		required this.caminhoSvg,
 		required this.texto,
+		required this.function,
+		required this.mainAxis,
+		required this.colorBack,
 	});
 
 	@override
 	Widget build(BuildContext context) {
-		return Container(
-			width: double.infinity,
-			color: CupertinoColors.transparent,
-			child: Row(
-				spacing:5,
-				children: [
-					SvgPicture.asset(
-						caminhoSvg,
-						width: 40,
-						height: 40,
-					),
-					TextApp(
-						texto: texto, 
-						size: 28
-					)
-				],
+		return Material(
+			color: colorBack,
+			child: InkWell(
+				focusColor:BackgroundAndBarColors.barColor ,
+				onTap: function,
+				child: Row(
+					spacing:5,
+					mainAxisSize: (mainAxis) ? MainAxisSize.min : MainAxisSize.max,
+					children: [
+						SvgPicture.asset(
+							caminhoSvg,
+							width: 40,
+							height: 40,
+						),
+						TextApp(
+							texto: texto, 
+							size: 28
+						)
+					],
+				),
 			),
 		);
   }
@@ -62,34 +72,35 @@ class SectionTypeTransaction extends StatelessWidget {
 					child: Column(
 						spacing: 13,
 						children: [
-							GestureDetector(
-								onTap: (){
+							OptionTypeTransaction(
+								function: 
+								(){
 									Navigator.pushNamed(
 										context, 
 										Routes.showTransactionsRevenue
 									);
 								},
-								child: OptionTypeTransaction(
-									caminhoSvg: 'assets/icons/home/bonificacao_icon.svg',
-									texto: "Receita",
-								),
+								colorBack: MiscellaneousColors.darkGray,
+								caminhoSvg: 'assets/icons/home/bonificacao_icon.svg',
+								texto: "Receita",
+								mainAxis: false,
 							),
 							Container(
 								color: BackgroundAndBarColors.background,
 								height: 1,
 								width: double.infinity,
 							),
-							GestureDetector(
-								onTap: (){
+							OptionTypeTransaction(
+								function: (){
 									Navigator.pushNamed(
 										context, 
 										Routes.showTransactionsExpense
 									);
 								},
-								child: OptionTypeTransaction(
+								colorBack: MiscellaneousColors.darkGray,
 								caminhoSvg: 'assets/icons/home/despesa_icon.svg',
 								texto: "Despesa",
-								),
+								mainAxis: false,
 							),
 						],
 					),
