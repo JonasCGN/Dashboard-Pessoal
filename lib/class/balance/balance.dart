@@ -159,14 +159,18 @@ class BalanceList {
 	}
 
 	List<Transaction> getRecentTransactions(int qtd) {
-		final allTransactions = balances
+		final today = DateTime.now();
+		final todayTransactions = balances
 			.expand((balance) => balance.transactions.transactions)
-			.where((transaction) => transaction.dateVenc.isBefore(currentDate) || transaction.dateVenc.isAtSameMomentAs(currentDate))
+			.where((transaction) =>
+				transaction.dateVenc.year == today.year &&
+				transaction.dateVenc.month == today.month &&
+				transaction.dateVenc.day == today.day)
 			.toList();
 
-		allTransactions.sort((a, b) => b.dateVenc.compareTo(a.dateVenc));
+		todayTransactions.sort((a, b) => b.dateVenc.compareTo(a.dateVenc));
 
-		return allTransactions.take(qtd).toList();
+		return todayTransactions.take(qtd).toList();
 	}
 
 	Balance getCurrentBalance() {
